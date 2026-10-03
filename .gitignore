@@ -1,0 +1,28 @@
+# Secrets and machine-specific environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Java / Maven
+**/target/
+*.class
+# Node / Next.js
+**/node_modules/
+**/.next/
+**/out/
+**/coverage/
+**/playwright-report/
+**/test-results/
+*.tsbuildinfo
+# Local data and runtime artifacts (governed assets stay versioned)
+data/raw/
+data/local/
+infrastructure/volumes/
+*.log
+# Editors / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

@@ -689,7 +689,7 @@ Consider:
 
 ## 7. Suggested architecture
 
-The final stack can evolve, but the logical architecture should preserve separation of concerns.
+The initial stack is defined in section 8. Any evolution must be justified explicitly; the logical architecture must preserve separation of concerns.
 
 ```text
                            ┌────────────────────┐
@@ -763,37 +763,29 @@ Do not implement providers merely for appearance.
 
 ---
 
-## 8. Technology guidance
+## 8. Initial technology decisions
 
-Technology choices should optimize speed, reliability and team familiarity.
+The initial stack is fixed to optimize speed, reliability and team familiarity:
 
-Reasonable options include:
+| Area | Decision |
+|---|---|
+| Backend / API | Java 21 + Spring Boot 3.x, Maven, REST |
+| Frontend | Next.js + TypeScript |
+| Data | PostgreSQL 17 + pgvector for textual retrieval when required |
+| Migrations | Flyway |
+| Backend tests | JUnit 5 + Testcontainers |
+| Frontend tests | Vitest + Playwright |
+| Local infrastructure | Docker Compose |
+| Observability | OpenTelemetry + structured logs |
+| AI | OpenAI initially behind a provider abstraction |
 
-### Frontend
+Pin exact dependency versions and validate compatibility and support in the first
+implementation change. Architecture changes require an explicit OpenSpec
+justification and an updated ADR. See the initial ADRs in
+`docs/architecture/decisions/`.
 
-- React;
-- Next.js;
-- TypeScript.
-
-### Backend
-
-- Java + Spring Boot;
-- or another stack explicitly justified in OpenSpec.
-
-### Data
-
-- PostgreSQL;
-- pgvector when vector search is required.
-
-### AI
-
-Use an LLM provider through an abstraction layer.
-
-### Observability
-
-Use structured logs and metrics.
-
-If Grafana/OpenTelemetry or another telemetry stack is used, instrumentation should remain simple enough to fit the sprint.
+This repository preparation establishes decisions and directories only. It does
+not implement the stack, create application manifests or validate product behavior.
 
 ---
 

@@ -22,6 +22,15 @@ context: |
   Prefer a complete vertical slice over broad but incomplete feature
   coverage.
 
+  Initial stack: Java 21 + Spring Boot 3.x (Maven, REST), Next.js +
+  TypeScript, PostgreSQL 17 + pgvector, Flyway, JUnit 5/Testcontainers,
+  Vitest/Playwright, Docker Compose, OpenTelemetry and structured logs.
+  OpenAI is the initial LLM adapter behind a provider abstraction.
+  Exact dependency versions will be pinned in the first implementation change.
+  The repository currently contains no functional application or validated
+  product assets. Do not invent OpenSpec specs or claim RFI compliance.
+  Keep the original RFI in docs/ and its identical copy in docs/rfi/.
+
   Read docs/PROJECT_CONTEXT.md and AGENTS.md for the complete project
   constraints.
 
@@ -42,7 +51,7 @@ rules:
     - Explain security boundaries
     - Explain grounding and provenance
     - Avoid speculative architecture
-    - Prefer PostgreSQL and the existing project stack unless justified otherwise
+    - Use the initial stack recorded in context and ADRs; document any proposed change before implementation
 
   tasks:
     - Break implementation into independently verifiable tasks
@@ -56,6 +65,7 @@ operations:
       - Run relevant tests after each meaningful implementation increment
       - Do not mark tasks complete if acceptance criteria are not satisfied
       - Report implementation gaps explicitly
+      - Treat repository-only checks as preparation checks, not application test evidence
 
   archive:
     guidance:

@@ -1,32 +1,64 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+context: |
+  LUPA is a conversational AI product for exploring official
+  Brazilian public-transparency data.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  The current sprint has a five-day delivery horizon.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+  OpenSpec requirements must preserve traceability to the CGU RFI
+  whenever applicable.
+
+  Official data is authoritative.
+
+  Factual answers must be grounded in retrieved evidence.
+
+  Text-to-SQL must operate through the Semantic Transparency Model
+  when available and all generated SQL must pass validation before
+  execution.
+
+  Database access for AI-generated queries must be read-only.
+
+  Prefer a complete vertical slice over broad but incomplete feature
+  coverage.
+
+  Read docs/PROJECT_CONTEXT.md and AGENTS.md for the complete project
+  constraints.
+
+rules:
+  proposal:
+    - State which CGU RFI requirements are affected when applicable
+    - Explicitly state what is out of scope
+    - Identify external dependencies
+    - Prefer the smallest complete vertical slice
+
+  specs:
+    - Use MUST for mandatory behavior
+    - Every critical requirement must have acceptance scenarios
+    - Include failure and insufficient-evidence scenarios
+    - Preserve RFI identifiers when applicable
+
+  design:
+    - Explain security boundaries
+    - Explain grounding and provenance
+    - Avoid speculative architecture
+    - Prefer PostgreSQL and the existing project stack unless justified otherwise
+
+  tasks:
+    - Break implementation into independently verifiable tasks
+    - Include automated tests with implementation tasks
+    - Include evidence generation when relevant
+    - Prioritize P0 before P1 and P2
+
+operations:
+  apply:
+    guidance:
+      - Run relevant tests after each meaningful implementation increment
+      - Do not mark tasks complete if acceptance criteria are not satisfied
+      - Report implementation gaps explicitly
+
+  archive:
+    guidance:
+      - Verify tests before archiving
+      - Update requirement-to-evidence traceability
+      - Record remaining limitations

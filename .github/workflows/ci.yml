@@ -1,0 +1,74 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository:
+    name: Repository integrity (no application yet)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check whitespace
+        run: git show --format= --check HEAD
+
+      - name: Check structure, RFI and local links
+        shell: pwsh
+        run: ./infrastructure/check-repository.ps1
+
+      - name: Install YAML validator
+        run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.2
+
+      - name: Validate YAML syntax and OpenSpec configuration
+        shell: python
+        run: |
+          from pathlib import Path
+          import yaml
+
+          class UniqueKeyLoader(yaml.SafeLoader):
+              pass
+
+          def mapping(loader, node, deep=False):
+              result = {}
+              for key_node, value_node in node.value:
+                  key = loader.construct_object(key_node, deep=deep)
+                  if key in result:
+                      raise ValueError(f"Duplicate YAML key: {key}")
+                  result[key] = loader.construct_object(value_node, deep=deep)
+              return result
+
+          UniqueKeyLoader.add_constructor(
+              yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, mapping
+          )
+          paths = [Path("openspec/config.yaml")]
+          paths += sorted(Path(".github/workflows").glob("*.yml"))
+          paths += sorted(Path(".github/workflows").glob("*.yaml"))
+          for path in paths:
+              yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
+              print(f"Valid YAML: {path}")
+          config = yaml.load(paths[0].read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
+          assert config["schema"] == "spec-driven"
+          assert isinstance(config["context"], str) and config["context"].strip()
+          for artifact in ("proposal", "specs", "design", "tasks"):
+              guidance = config["rules"][artifact]
+              assert isinstance(guidance, list) and guidance
+              assert all(isinstance(item, str) and item.strip() for item in guidance)
+          for operation in ("apply", "archive"):
+              guidance = config["operations"][operation]["guidance"]
+              assert isinstance(guidance, list) and guidance
+              assert all(isinstance(item, str) and item.strip() for item in guidance)
+          print("OpenSpec context, artifact rules and operation guidance: OK.")
